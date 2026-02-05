@@ -17,6 +17,11 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.x'
+
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
@@ -29,6 +34,9 @@ jobs:
       - name: Build PCF
         run: npm run build
 
+      - name: Build PCF Project
+        run: msbuild BotIframe.pcfproj /t:build /restore /p:Configuration=Release
+
       - name: Create Solution
         run: |
           if (Test-Path Solution) { Remove-Item -Recurse -Force Solution }
@@ -38,11 +46,20 @@ jobs:
           pac solution add-reference --path ../
 
       - name: Build Solution
-        run: msbuild Solution/Solution.cdsproj /t:build /restore /p:Configuration=Release
+        run: |
+          cd Solution
+          msbuild /t:build /restore /p:Configuration=Release
+
+      - name: List Files
+        run: |
+          echo "=== Solution bin folder ==="
+          Get-ChildItem -Path Solution/bin -Recurse
+          echo "=== Check for zip ==="
+          Get-ChildItem -Path Solution/bin/Release -Filter *.zip -Recurse
 
       - name: Upload Solution Artifact
         uses: actions/upload-artifact@v4
         with:
           name: PowerApps-Solution
-          path: Solution/bin/Release/**/*.zip
+          path: Solution/bin/Release/*.zip
           if-no-files-found: warn
