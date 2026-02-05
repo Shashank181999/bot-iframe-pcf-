@@ -38,8 +38,12 @@ jobs:
           New-Item -ItemType Directory -Path "packfolder/Controls/cra0a_Company.Demo.BotIframe" -Force
           New-Item -ItemType Directory -Path "packfolder/Other" -Force
 
-          # Copy PCF output files
-          Copy-Item "out/controls/*" -Destination "packfolder/Controls/cra0a_Company.Demo.BotIframe/" -Recurse -Force
+          # Show PCF build output structure
+          Write-Host "=== PCF build output ==="
+          Get-ChildItem -Path "out/controls" -Recurse | ForEach-Object { Write-Host $_.FullName }
+
+          # Copy PCF output files (contents of the built control folder)
+          Copy-Item "out/controls/Company.Demo.BotIframe/*" -Destination "packfolder/Controls/cra0a_Company.Demo.BotIframe/" -Recurse -Force
 
           # Create [Content_Types].xml
           @'
@@ -130,7 +134,7 @@ jobs:
             <optionsets />
             <CustomControls>
               <CustomControl Name="cra0a_Company.Demo.BotIframe" IntroducedVersion="1.0.0">
-                <FileName>/Controls/cra0a_Company.Demo.BotIframe/ControlManifest.xml</FileName>
+                <FileName>Controls/cra0a_Company.Demo.BotIframe/ControlManifest.xml</FileName>
               </CustomControl>
             </CustomControls>
             <SolutionPluginAssemblies />
