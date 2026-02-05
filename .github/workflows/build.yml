@@ -35,11 +35,11 @@ jobs:
         shell: pwsh
         run: |
           # Create solution folder structure (PAC CLI expects Other/ folder)
-          New-Item -ItemType Directory -Path "solution/Controls/cra0a_Company.Demo.BotIframe" -Force
-          New-Item -ItemType Directory -Path "solution/Other" -Force
+          New-Item -ItemType Directory -Path "packfolder/Controls/cra0a_Company.Demo.BotIframe" -Force
+          New-Item -ItemType Directory -Path "packfolder/Other" -Force
 
           # Copy PCF output files
-          Copy-Item "out/controls/*" -Destination "solution/Controls/cra0a_Company.Demo.BotIframe/" -Recurse -Force
+          Copy-Item "out/controls/*" -Destination "packfolder/Controls/cra0a_Company.Demo.BotIframe/" -Recurse -Force
 
           # Create [Content_Types].xml
           @'
@@ -50,7 +50,7 @@ jobs:
             <Default Extension="css" ContentType="application/octet-stream" />
             <Default Extension="resx" ContentType="application/octet-stream" />
           </Types>
-          '@ | Out-File -LiteralPath "solution/[Content_Types].xml" -Encoding utf8
+          '@ | Out-File -LiteralPath "packfolder/[Content_Types].xml" -Encoding utf8
 
           # Create Solution.xml in Other folder
           @'
@@ -113,7 +113,7 @@ jobs:
               <MissingDependencies />
             </SolutionManifest>
           </ImportExportXml>
-          '@ | Out-File -FilePath "solution/Other/Solution.xml" -Encoding utf8
+          '@ | Out-File -FilePath "packfolder/Other/Solution.xml" -Encoding utf8
 
           # Create Customizations.xml in Other folder
           @'
@@ -139,14 +139,14 @@ jobs:
               <Language>1033</Language>
             </Languages>
           </ImportExportXml>
-          '@ | Out-File -FilePath "solution/Other/Customizations.xml" -Encoding utf8
+          '@ | Out-File -FilePath "packfolder/Other/Customizations.xml" -Encoding utf8
 
           Write-Host "=== Solution structure ==="
-          Get-ChildItem -Path "solution" -Recurse | ForEach-Object { Write-Host $_.FullName }
+          Get-ChildItem -Path "packfolder" -Recurse | ForEach-Object { Write-Host $_.FullName }
 
       - name: Pack Solution
         run: |
-          pac solution pack --zipfile BotIframeSolution.zip --folder solution --allowDelete --allowWrite
+          pac solution pack --zipfile BotIframeSolution.zip --folder packfolder --allowDelete --allowWrite
           dir BotIframeSolution.zip
 
       - name: Verify Solution Contents
