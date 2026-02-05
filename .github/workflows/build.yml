@@ -51,9 +51,18 @@ jobs:
           Write-Host "=== Solution structure ==="
           Get-ChildItem -Path "packfolder" -Recurse | ForEach-Object { Write-Host $_.FullName }
 
-      - name: Pack Solution
+      - name: Create Solution Zip
+        shell: pwsh
         run: |
-          pac solution pack --zipfile BotIframeSolution.zip --folder packfolder --allowDelete --allowWrite
+          # Move files from Other to root (Power Platform expects flat structure in zip)
+          Move-Item "packfolder/Other/Solution.xml" "packfolder/solution.xml"
+          Move-Item "packfolder/Other/Customizations.xml" "packfolder/customizations.xml"
+          Remove-Item "packfolder/Other" -Force
+
+          # Create zip
+          Compress-Archive -Path "packfolder/*" -DestinationPath "BotIframeSolution.zip" -Force
+
+          Write-Host "=== Zip created ==="
           dir BotIframeSolution.zip
 
       - name: Verify Solution Contents
