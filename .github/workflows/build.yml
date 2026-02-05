@@ -22,12 +22,6 @@ jobs:
         with:
           dotnet-version: '6.x'
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
-
-      - name: Setup NuGet
-        uses: nuget/setup-nuget@v2
-
       - name: Install Power Platform CLI
         run: dotnet tool install --global Microsoft.PowerApps.CLI.Tool
 
@@ -37,49 +31,132 @@ jobs:
       - name: Build PCF
         run: npm run build
 
-      - name: Create and Build Solution
+      - name: Create Solution Structure
         shell: pwsh
         run: |
-          # Remove old solution folder if exists
-          if (Test-Path "SolutionPackage") { Remove-Item -Recurse -Force "SolutionPackage" }
+          # Create solution folder structure manually
+          New-Item -ItemType Directory -Path "solution/Controls/cra0a_Company.Demo.BotIframe" -Force
 
-          # Create solution folder structure
-          New-Item -ItemType Directory -Path "SolutionPackage" -Force
-          Set-Location "SolutionPackage"
+          # Copy PCF output files
+          Copy-Item "out/controls/*" -Destination "solution/Controls/cra0a_Company.Demo.BotIframe/" -Recurse -Force
 
-          # Initialize solution
-          pac solution init --publisher-name MyPublisher --publisher-prefix mp
+          # Create [Content_Types].xml
+          @'
+          <?xml version="1.0" encoding="utf-8"?>
+          <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+            <Default Extension="xml" ContentType="application/octet-stream" />
+            <Default Extension="js" ContentType="application/octet-stream" />
+            <Default Extension="css" ContentType="application/octet-stream" />
+            <Default Extension="resx" ContentType="application/octet-stream" />
+          </Types>
+          '@ | Out-File -FilePath "solution/[Content_Types].xml" -Encoding utf8
 
-          # Add reference to PCF project
-          pac solution add-reference --path ../
+          # Create solution.xml
+          @'
+          <?xml version="1.0" encoding="utf-8"?>
+          <ImportExportXml version="9.1.0.643" SolutionPackageVersion="9.1" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <SolutionManifest>
+              <UniqueName>BotIframeSolution</UniqueName>
+              <LocalizedNames>
+                <LocalizedName description="Bot Iframe Solution" languagecode="1033" />
+              </LocalizedNames>
+              <Descriptions />
+              <Version>1.0.0</Version>
+              <Managed>0</Managed>
+              <Publisher>
+                <UniqueName>Cr0f704</UniqueName>
+                <LocalizedNames>
+                  <LocalizedName description="CDS Default Publisher" languagecode="1033" />
+                </LocalizedNames>
+                <Descriptions>
+                  <Description description="CDS Default Publisher" languagecode="1033" />
+                </Descriptions>
+                <EMailAddress xsi:nil="true" />
+                <SupportingWebsiteUrl xsi:nil="true" />
+                <CustomizationPrefix>cra0a</CustomizationPrefix>
+                <CustomizationOptionValuePrefix>58098</CustomizationOptionValuePrefix>
+                <Addresses>
+                  <Address>
+                    <AddressNumber>1</AddressNumber>
+                    <AddressTypeCode>1</AddressTypeCode>
+                    <City xsi:nil="true" />
+                    <County xsi:nil="true" />
+                    <Country xsi:nil="true" />
+                    <Fax xsi:nil="true" />
+                    <FreightTermsCode xsi:nil="true" />
+                    <ImportSequenceNumber xsi:nil="true" />
+                    <Latitude xsi:nil="true" />
+                    <Line1 xsi:nil="true" />
+                    <Line2 xsi:nil="true" />
+                    <Line3 xsi:nil="true" />
+                    <Longitude xsi:nil="true" />
+                    <Name xsi:nil="true" />
+                    <PostalCode xsi:nil="true" />
+                    <PostOfficeBox xsi:nil="true" />
+                    <PrimaryContactName xsi:nil="true" />
+                    <ShippingMethodCode>1</ShippingMethodCode>
+                    <StateOrProvince xsi:nil="true" />
+                    <Telephone1 xsi:nil="true" />
+                    <Telephone2 xsi:nil="true" />
+                    <Telephone3 xsi:nil="true" />
+                    <TimeZoneRuleVersionNumber xsi:nil="true" />
+                    <UPSZone xsi:nil="true" />
+                    <UTCOffset xsi:nil="true" />
+                    <UTCConversionTimeZoneCode xsi:nil="true" />
+                  </Address>
+                </Addresses>
+              </Publisher>
+              <RootComponents>
+                <RootComponent type="66" schemaName="cra0a_Company.Demo.BotIframe" behavior="0" />
+              </RootComponents>
+              <MissingDependencies />
+            </SolutionManifest>
+          </ImportExportXml>
+          '@ | Out-File -FilePath "solution/solution.xml" -Encoding utf8
 
-          # Restore and build
-          nuget restore
-          msbuild /t:build /restore /p:Configuration=Release
+          # Create customizations.xml
+          @'
+          <?xml version="1.0" encoding="utf-8"?>
+          <ImportExportXml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <Entities />
+            <Roles />
+            <Workflows />
+            <FieldSecurityProfiles />
+            <Templates />
+            <EntityMaps />
+            <EntityRelationships />
+            <OrganizationSettings />
+            <optionsets />
+            <CustomControls>
+              <CustomControl Name="cra0a_Company.Demo.BotIframe" IntroducedVersion="1.0.0">
+                <FileName>Controls/cra0a_Company.Demo.BotIframe/ControlManifest.xml</FileName>
+              </CustomControl>
+            </CustomControls>
+            <SolutionPluginAssemblies />
+            <EntityDataProviders />
+            <Languages>
+              <Language>1033</Language>
+            </Languages>
+          </ImportExportXml>
+          '@ | Out-File -FilePath "solution/customizations.xml" -Encoding utf8
 
-          # Show what was created
-          Write-Host "=== Contents of bin/Release ==="
-          Get-ChildItem -Path "bin/Release" -Recurse | ForEach-Object { Write-Host $_.FullName }
+          Write-Host "=== Solution structure ==="
+          Get-ChildItem -Path "solution" -Recurse | ForEach-Object { Write-Host $_.FullName }
 
-      - name: Extract and Repackage Solution
+      - name: Pack Solution
+        run: |
+          pac solution pack --zipfile BotIframeSolution.zip --folder solution --allowDelete --allowWrite
+          dir BotIframeSolution.zip
+
+      - name: Verify Solution Contents
         shell: pwsh
         run: |
-          $zipFile = Get-ChildItem -Path "SolutionPackage/bin/Release" -Filter "*.zip" | Select-Object -First 1
-          if ($zipFile) {
-            Write-Host "Found zip: $($zipFile.FullName)"
-
-            # Extract
-            Expand-Archive -Path $zipFile.FullName -DestinationPath "SolutionExtracted" -Force
-
-            Write-Host "=== Extracted contents ==="
-            Get-ChildItem -Path "SolutionExtracted" -Recurse | ForEach-Object { Write-Host $_.FullName }
-          } else {
-            Write-Host "No zip file found!"
-          }
+          Expand-Archive -Path "BotIframeSolution.zip" -DestinationPath "verify" -Force
+          Write-Host "=== Solution contents ==="
+          Get-ChildItem -Path "verify" -Recurse | ForEach-Object { Write-Host $_.FullName }
 
       - name: Upload Solution Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: PowerApps-Solution
-          path: SolutionPackage/bin/Release/*.zip
-          if-no-files-found: warn
+          name: BotIframe-Solution
+          path: BotIframeSolution.zip
