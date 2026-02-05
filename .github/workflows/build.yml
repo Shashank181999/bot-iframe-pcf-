@@ -49,7 +49,7 @@ jobs:
             <Default Extension="css" ContentType="application/octet-stream" />
             <Default Extension="resx" ContentType="application/octet-stream" />
           </Types>
-          '@ | Out-File -FilePath "solution/[Content_Types].xml" -Encoding utf8
+          '@ | Out-File -LiteralPath "solution/[Content_Types].xml" -Encoding utf8
 
           # Create solution.xml
           @'
