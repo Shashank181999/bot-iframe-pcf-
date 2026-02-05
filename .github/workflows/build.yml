@@ -45,105 +45,108 @@ jobs:
           # Copy PCF output files (directly from out/controls/)
           Copy-Item "out/controls/*" -Destination "packfolder/Controls/cra0a_Company.Demo.BotIframe/" -Recurse -Force
 
-          # Create [Content_Types].xml
-          @'
-          <?xml version="1.0" encoding="utf-8"?>
-          <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-            <Default Extension="xml" ContentType="application/octet-stream" />
-            <Default Extension="js" ContentType="application/octet-stream" />
-            <Default Extension="css" ContentType="application/octet-stream" />
-            <Default Extension="resx" ContentType="application/octet-stream" />
-          </Types>
-          '@ | Out-File -LiteralPath "packfolder/[Content_Types].xml" -Encoding utf8
+          # Create [Content_Types].xml (no leading whitespace!)
+          $contentTypes = @'
+<?xml version="1.0" encoding="utf-8"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="xml" ContentType="application/octet-stream" />
+  <Default Extension="js" ContentType="application/octet-stream" />
+  <Default Extension="css" ContentType="application/octet-stream" />
+  <Default Extension="resx" ContentType="application/octet-stream" />
+</Types>
+'@
+          [System.IO.File]::WriteAllText("packfolder/[Content_Types].xml", $contentTypes)
 
           # Create Solution.xml in Other folder
-          @'
-          <?xml version="1.0" encoding="utf-8"?>
-          <ImportExportXml version="9.1.0.643" SolutionPackageVersion="9.1" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <SolutionManifest>
-              <UniqueName>BotIframeSolution</UniqueName>
-              <LocalizedNames>
-                <LocalizedName description="Bot Iframe Solution" languagecode="1033" />
-              </LocalizedNames>
-              <Descriptions />
-              <Version>1.0.0</Version>
-              <Managed>0</Managed>
-              <Publisher>
-                <UniqueName>Cr0f704</UniqueName>
-                <LocalizedNames>
-                  <LocalizedName description="CDS Default Publisher" languagecode="1033" />
-                </LocalizedNames>
-                <Descriptions>
-                  <Description description="CDS Default Publisher" languagecode="1033" />
-                </Descriptions>
-                <EMailAddress xsi:nil="true" />
-                <SupportingWebsiteUrl xsi:nil="true" />
-                <CustomizationPrefix>cra0a</CustomizationPrefix>
-                <CustomizationOptionValuePrefix>58098</CustomizationOptionValuePrefix>
-                <Addresses>
-                  <Address>
-                    <AddressNumber>1</AddressNumber>
-                    <AddressTypeCode>1</AddressTypeCode>
-                    <City xsi:nil="true" />
-                    <County xsi:nil="true" />
-                    <Country xsi:nil="true" />
-                    <Fax xsi:nil="true" />
-                    <FreightTermsCode xsi:nil="true" />
-                    <ImportSequenceNumber xsi:nil="true" />
-                    <Latitude xsi:nil="true" />
-                    <Line1 xsi:nil="true" />
-                    <Line2 xsi:nil="true" />
-                    <Line3 xsi:nil="true" />
-                    <Longitude xsi:nil="true" />
-                    <Name xsi:nil="true" />
-                    <PostalCode xsi:nil="true" />
-                    <PostOfficeBox xsi:nil="true" />
-                    <PrimaryContactName xsi:nil="true" />
-                    <ShippingMethodCode>1</ShippingMethodCode>
-                    <StateOrProvince xsi:nil="true" />
-                    <Telephone1 xsi:nil="true" />
-                    <Telephone2 xsi:nil="true" />
-                    <Telephone3 xsi:nil="true" />
-                    <TimeZoneRuleVersionNumber xsi:nil="true" />
-                    <UPSZone xsi:nil="true" />
-                    <UTCOffset xsi:nil="true" />
-                    <UTCConversionTimeZoneCode xsi:nil="true" />
-                  </Address>
-                </Addresses>
-              </Publisher>
-              <RootComponents>
-                <RootComponent type="66" schemaName="cra0a_Company.Demo.BotIframe" behavior="0" />
-              </RootComponents>
-              <MissingDependencies />
-            </SolutionManifest>
-          </ImportExportXml>
-          '@ | Out-File -FilePath "packfolder/Other/Solution.xml" -Encoding utf8
+          $solutionXml = @'
+<?xml version="1.0" encoding="utf-8"?>
+<ImportExportXml version="9.1.0.643" SolutionPackageVersion="9.1" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SolutionManifest>
+    <UniqueName>BotIframeSolution</UniqueName>
+    <LocalizedNames>
+      <LocalizedName description="Bot Iframe Solution" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions />
+    <Version>1.0.0</Version>
+    <Managed>0</Managed>
+    <Publisher>
+      <UniqueName>Cr0f704</UniqueName>
+      <LocalizedNames>
+        <LocalizedName description="CDS Default Publisher" languagecode="1033" />
+      </LocalizedNames>
+      <Descriptions>
+        <Description description="CDS Default Publisher" languagecode="1033" />
+      </Descriptions>
+      <EMailAddress xsi:nil="true" />
+      <SupportingWebsiteUrl xsi:nil="true" />
+      <CustomizationPrefix>cra0a</CustomizationPrefix>
+      <CustomizationOptionValuePrefix>58098</CustomizationOptionValuePrefix>
+      <Addresses>
+        <Address>
+          <AddressNumber>1</AddressNumber>
+          <AddressTypeCode>1</AddressTypeCode>
+          <City xsi:nil="true" />
+          <County xsi:nil="true" />
+          <Country xsi:nil="true" />
+          <Fax xsi:nil="true" />
+          <FreightTermsCode xsi:nil="true" />
+          <ImportSequenceNumber xsi:nil="true" />
+          <Latitude xsi:nil="true" />
+          <Line1 xsi:nil="true" />
+          <Line2 xsi:nil="true" />
+          <Line3 xsi:nil="true" />
+          <Longitude xsi:nil="true" />
+          <Name xsi:nil="true" />
+          <PostalCode xsi:nil="true" />
+          <PostOfficeBox xsi:nil="true" />
+          <PrimaryContactName xsi:nil="true" />
+          <ShippingMethodCode>1</ShippingMethodCode>
+          <StateOrProvince xsi:nil="true" />
+          <Telephone1 xsi:nil="true" />
+          <Telephone2 xsi:nil="true" />
+          <Telephone3 xsi:nil="true" />
+          <TimeZoneRuleVersionNumber xsi:nil="true" />
+          <UPSZone xsi:nil="true" />
+          <UTCOffset xsi:nil="true" />
+          <UTCConversionTimeZoneCode xsi:nil="true" />
+        </Address>
+      </Addresses>
+    </Publisher>
+    <RootComponents>
+      <RootComponent type="66" schemaName="cra0a_Company.Demo.BotIframe" behavior="0" />
+    </RootComponents>
+    <MissingDependencies />
+  </SolutionManifest>
+</ImportExportXml>
+'@
+          [System.IO.File]::WriteAllText("packfolder/Other/Solution.xml", $solutionXml)
 
           # Create Customizations.xml in Other folder
-          @'
-          <?xml version="1.0" encoding="utf-8"?>
-          <ImportExportXml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-            <Entities />
-            <Roles />
-            <Workflows />
-            <FieldSecurityProfiles />
-            <Templates />
-            <EntityMaps />
-            <EntityRelationships />
-            <OrganizationSettings />
-            <optionsets />
-            <CustomControls>
-              <CustomControl Name="cra0a_Company.Demo.BotIframe" IntroducedVersion="1.0.0">
-                <FileName>Controls/cra0a_Company.Demo.BotIframe/ControlManifest.xml</FileName>
-              </CustomControl>
-            </CustomControls>
-            <SolutionPluginAssemblies />
-            <EntityDataProviders />
-            <Languages>
-              <Language>1033</Language>
-            </Languages>
-          </ImportExportXml>
-          '@ | Out-File -FilePath "packfolder/Other/Customizations.xml" -Encoding utf8
+          $customizationsXml = @'
+<?xml version="1.0" encoding="utf-8"?>
+<ImportExportXml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Entities />
+  <Roles />
+  <Workflows />
+  <FieldSecurityProfiles />
+  <Templates />
+  <EntityMaps />
+  <EntityRelationships />
+  <OrganizationSettings />
+  <optionsets />
+  <CustomControls>
+    <CustomControl Name="cra0a_Company.Demo.BotIframe" IntroducedVersion="1.0.0">
+      <FileName>Controls/cra0a_Company.Demo.BotIframe/ControlManifest.xml</FileName>
+    </CustomControl>
+  </CustomControls>
+  <SolutionPluginAssemblies />
+  <EntityDataProviders />
+  <Languages>
+    <Language>1033</Language>
+  </Languages>
+</ImportExportXml>
+'@
+          [System.IO.File]::WriteAllText("packfolder/Other/Customizations.xml", $customizationsXml)
 
           Write-Host "=== Solution structure ==="
           Get-ChildItem -Path "packfolder" -Recurse | ForEach-Object { Write-Host $_.FullName }
