@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImportExportXml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Entities />
+  <Roles />
+  <Workflows />
+  <FieldSecurityProfiles />
+  <Templates />
+  <EntityMaps />
+  <EntityRelationships />
+  <OrganizationSettings />
+  <optionsets />
+  <CustomControls>
+    <CustomControl Name="cra0a_Company.Demo.BotIframe" IntroducedVersion="1.0.0">
+      <FileName>Controls/cra0a_Company.Demo.BotIframe/ControlManifest.xml</FileName>
+    </CustomControl>
+  </CustomControls>
+  <SolutionPluginAssemblies />
+  <EntityDataProviders />
+  <Languages>
+    <Language>1033</Language>
+  </Languages>
+</ImportExportXml>

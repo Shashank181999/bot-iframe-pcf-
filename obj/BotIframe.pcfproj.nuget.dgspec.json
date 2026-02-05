@@ -1,0 +1,50 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/mavision/pcf-bot-iframe/BotIframe.pcfproj": {}
+  },
+  "projects": {
+    "/Users/mavision/pcf-bot-iframe/BotIframe.pcfproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/mavision/pcf-bot-iframe/BotIframe.pcfproj",
+        "projectName": "BotIframe",
+        "projectPath": "/Users/mavision/pcf-bot-iframe/BotIframe.pcfproj",
+        "packagesPath": "/Users/mavision/.nuget/packages/",
+        "outputPath": "/Users/mavision/pcf-bot-iframe/obj/",
+        "projectStyle": "PackageReference",
+        "skipContentFileWrite": true,
+        "UsingMicrosoftNETSdk": false,
+        "configFilePaths": [
+          "/Users/mavision/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net462"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net462": {
+            "projectReferences": {}
+          }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net462": {
+          "dependencies": {
+            "Microsoft.PowerApps.MSBuild.Pcf": {
+              "target": "Package",
+              "version": "[1.*, )"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Canvas App — Bot Iframe (Website Channel)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 12px;
+      background: #ffffff;
+      color: #000000;
+    }
+
+    .canvas-app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      border: 1px solid #000000;
+    }
+
+    .app-header {
+      background: #ffffff;
+      border-bottom: 1px solid #000000;
+      padding: 12px 16px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .app-main {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .nav-sidebar {
+      width: 160px;
+      background: #ffffff;
+      border-right: 1px solid #000000;
+      padding: 12px 0;
+    }
+
+    .nav-title {
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+      padding: 0 12px 8px;
+    }
+
+    .nav-list { list-style: none; }
+
+    .nav-item {
+      padding: 10px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid transparent;
+    }
+
+    .nav-item:hover { background: #f0f0f0; }
+    .nav-item.active { background: #000000; color: #ffffff; }
+    .nav-bullet { width: 4px; height: 4px; background: currentColor; }
+
+    .content-section {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    /* Page content areas */
+    .page { display: none; flex: 1; flex-direction: column; }
+    .page.active { display: flex; }
+
+    .page-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #000;
+    }
+
+    .page-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Home page */
+    .home-cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .home-card {
+      border: 1px solid #000;
+      padding: 16px;
+      cursor: pointer;
+    }
+
+    .home-card:hover {
+      background: #f5f5f5;
+    }
+
+    .home-card-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .home-card-desc {
+      font-size: 11px;
+      color: #333;
+    }
+
+    /* Bot iframe component styles */
+    .bot-iframe-container {
+      flex: 1;
+      background: #ffffff;
+      color: #000000;
+      border: 1px solid #000000;
+      display: flex;
+      flex-direction: column;
+      min-height: 400px;
+    }
+
+    .bot-iframe-header {
+      background: #ffffff;
+      border-bottom: 1px solid #000000;
+      padding: 8px 12px;
+    }
+
+    .bot-iframe-title {
+      font-weight: bold;
+      font-size: 14px;
+      display: block;
+    }
+
+    .bot-iframe-source {
+      font-size: 11px;
+    }
+
+    .bot-iframe-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .bot-iframe {
+      width: 100%;
+      height: 100%;
+      flex: 1;
+      border: 0;
+      background: #ffffff;
+    }
+
+    .bot-iframe-error {
+      background: #ffffff;
+      color: #000000;
+      border-top: 1px solid #000000;
+      font-size: 11px;
+      padding: 6px 12px;
+      font-style: italic;
+    }
+
+    .bot-iframe-footer {
+      background: #ffffff;
+      border-top: 1px solid #000000;
+      font-size: 10px;
+      padding: 4px 12px;
+      font-style: italic;
+    }
+
+    .url-input-section {
+      margin-top: 16px;
+      padding: 12px;
+      border: 1px solid #000000;
+    }
+
+    .url-input-section label {
+      display: block;
+      font-size: 11px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .url-input-row { display: flex; gap: 8px; }
+
+    .url-input-section input {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #000000;
+      font-size: 12px;
+      font-family: monospace;
+    }
+
+    .url-input-section button {
+      padding: 8px 16px;
+      border: 1px solid #000000;
+      background: #ffffff;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .url-input-section button:hover {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    /* Status page */
+    .status-list {
+      border: 1px solid #000;
+    }
+
+    .status-item {
+      padding: 12px;
+      border-bottom: 1px solid #000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-item:last-child {
+      border-bottom: none;
+    }
+
+    .status-label {
+      font-weight: bold;
+    }
+
+    .status-value {
+      padding: 4px 8px;
+      font-size: 11px;
+    }
+
+    .status-ok {
+      background: #fff;
+      border: 1px solid #000;
+    }
+
+    /* Settings page */
+    .settings-form {
+      border: 1px solid #000;
+      padding: 16px;
+    }
+
+    .settings-group {
+      margin-bottom: 16px;
+    }
+
+    .settings-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .settings-label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .settings-input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #000;
+      font-size: 12px;
+    }
+
+    .settings-hint {
+      font-size: 10px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .app-footer {
+      background: #ffffff;
+      border-top: 1px solid #000000;
+      padding: 8px 16px;
+      font-size: 10px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="canvas-app">
+    <header class="app-header">Canvas App — Bot Iframe (Website Channel)</header>
+
+    <main class="app-main">
+      <nav class="nav-sidebar">
+        <div class="nav-title">Navigation</div>
+        <ul class="nav-list">
+          <li class="nav-item" data-page="home" onclick="navigate('home')">
+            <span class="nav-bullet"></span> Home
+          </li>
+          <li class="nav-item active" data-page="validate" onclick="navigate('validate')">
+            <span class="nav-bullet"></span> Validate Invoice
+          </li>
+          <li class="nav-item" data-page="status" onclick="navigate('status')">
+            <span class="nav-bullet"></span> Check Status
+          </li>
+          <li class="nav-item" data-page="settings" onclick="navigate('settings')">
+            <span class="nav-bullet"></span> Settings
+          </li>
+        </ul>
+      </nav>
+
+      <section class="content-section">
+        <!-- Home Page -->
+        <div class="page" id="page-home">
+          <div class="page-title">Home</div>
+          <div class="page-content">
+            <div class="home-cards">
+              <div class="home-card" onclick="navigate('validate')">
+                <div class="home-card-title">Validate Invoice</div>
+                <div class="home-card-desc">Use Copilot to validate invoices and check for discrepancies.</div>
+              </div>
+              <div class="home-card" onclick="navigate('status')">
+                <div class="home-card-title">Check Status</div>
+                <div class="home-card-desc">View system status and recent validation results.</div>
+              </div>
+              <div class="home-card" onclick="navigate('settings')">
+                <div class="home-card-title">Settings</div>
+                <div class="home-card-desc">Configure bot URL and application preferences.</div>
+              </div>
+              <div class="home-card">
+                <div class="home-card-title">Documentation</div>
+                <div class="home-card-desc">Learn how to use the Invoice Validation Bot.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Validate Invoice Page (Bot) -->
+        <div class="page active" id="page-validate">
+          <div class="bot-iframe-container">
+            <div class="bot-iframe-header">
+              <span class="bot-iframe-title">Embedded Copilot (Website Channel)</span>
+              <span class="bot-iframe-source">Source: EV_BOT_URL</span>
+            </div>
+            <div class="bot-iframe-content">
+              <iframe 
+                id="botIframe"
+                class="bot-iframe" 
+                title="Embedded Copilot (Website Channel)"
+                sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
+                referrerpolicy="no-referrer"
+                allow="clipboard-read; clipboard-write"
+              ></iframe>
+            </div>
+            <div class="bot-iframe-error" id="errorBanner">
+              Bot unreachable. Check EV_BOT_URL or network.
+            </div>
+          </div>
+
+          <div class="url-input-section">
+            <label>EV_BOT_URL — Paste your Copilot Website Channel URL here:</label>
+            <div class="url-input-row">
+              <input type="text" id="urlInput" placeholder="https://www.wikipedia.org (test) or your bot URL">
+              <button onclick="loadBot()">Load Bot</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Check Status Page -->
+        <div class="page" id="page-status">
+          <div class="page-title">Check Status</div>
+          <div class="page-content">
+            <div class="status-list">
+              <div class="status-item">
+                <span class="status-label">Bot Connection</span>
+                <span class="status-value status-ok" id="botStatus">Not Connected</span>
+              </div>
+              <div class="status-item">
+                <span class="status-label">Environment</span>
+                <span class="status-value status-ok">DevSandbox1</span>
+              </div>
+              <div class="status-item">
+                <span class="status-label">Last Validation</span>
+                <span class="status-value status-ok">--</span>
+              </div>
+              <div class="status-item">
+                <span class="status-label">System Status</span>
+                <span class="status-value status-ok">Operational</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div class="page" id="page-settings">
+          <div class="page-title">Settings</div>
+          <div class="page-content">
+            <div class="settings-form">
+              <div class="settings-group">
+                <label class="settings-label">EV_BOT_URL</label>
+                <input type="text" class="settings-input" id="settingsUrl" placeholder="Enter Website Channel URL">
+                <div class="settings-hint">The Copilot Website channel URL from Copilot Studio.</div>
+              </div>
+              <div class="settings-group">
+                <label class="settings-label">Environment</label>
+                <input type="text" class="settings-input" value="DevSandbox1" readonly>
+                <div class="settings-hint">Current environment (read-only).</div>
+              </div>
+              <div class="settings-group">
+                <button onclick="saveSettings()">Save & Apply</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+  </div>
+
+  <script>
+    const iframe = document.getElementById('botIframe');
+    const errorBanner = document.getElementById('errorBanner');
+    const botStatus = document.getElementById('botStatus');
+    
+    iframe.onload = function() {
+      if (iframe.src) {
+        errorBanner.style.display = 'none';
+        botStatus.textContent = 'Connected';
+      }
+    };
+    
+    iframe.onerror = function() {
+      errorBanner.style.display = 'block';
+      botStatus.textContent = 'Error';
+    };
+    
+    function loadBot() {
+      const url = document.getElementById('urlInput').value.trim();
+      if (url) {
+        iframe.src = url;
+        errorBanner.style.display = 'none';
+        document.getElementById('settingsUrl').value = url;
+        botStatus.textContent = 'Connecting...';
+      } else {
+        iframe.src = '';
+        errorBanner.style.display = 'block';
+        botStatus.textContent = 'Not Connected';
+      }
+    }
+
+    function navigate(pageName) {
+      // Update nav items
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.page === pageName) {
+          item.classList.add('active');
+        }
+      });
+
+      // Update pages
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
+      document.getElementById('page-' + pageName).classList.add('active');
+    }
+
+    function saveSettings() {
+      const url = document.getElementById('settingsUrl').value.trim();
+      document.getElementById('urlInput').value = url;
+      if (url) {
+        loadBot();
+      }
+      navigate('validate');
+    }
+  </script>
+</body>
+</html>

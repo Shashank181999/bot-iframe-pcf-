@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "dgSpecHash": "sHgwOU/HzDw=",
+  "success": true,
+  "projectFilePath": "/Users/mavision/pcf-bot-iframe/Solution/BotIframe/BotIframe.pcfproj",
+  "expectedPackageFiles": [
+    "/Users/mavision/.nuget/packages/microsoft.powerapps.msbuild.pcf/1.52.1/microsoft.powerapps.msbuild.pcf.1.52.1.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "message": "Error occurred while getting package vulnerability data: Access to the path '/Users/mavision/.local/share' is denied.",
+      "projectPath": "/Users/mavision/pcf-bot-iframe/Solution/BotIframe/BotIframe.pcfproj",
+      "warningLevel": 1,
+      "filePath": "/Users/mavision/pcf-bot-iframe/Solution/BotIframe/BotIframe.pcfproj",
+      "targetGraphs": []
+    }
+  ]
+}
