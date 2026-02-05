@@ -17,13 +17,16 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Setup .NET
+      - name: Setup .NET 6
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '6.x'
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
 
       - name: Install Power Platform CLI
         run: dotnet tool install --global Microsoft.PowerApps.CLI.Tool
@@ -34,32 +37,49 @@ jobs:
       - name: Build PCF
         run: npm run build
 
-      - name: Build PCF Project
-        run: msbuild BotIframe.pcfproj /t:build /restore /p:Configuration=Release
-
-      - name: Create Solution
+      - name: Create and Build Solution
+        shell: pwsh
         run: |
-          if (Test-Path Solution) { Remove-Item -Recurse -Force Solution }
-          mkdir Solution
-          cd Solution
-          pac solution init --publisher-name Publisher --publisher-prefix pub
+          # Remove old solution folder if exists
+          if (Test-Path "SolutionPackage") { Remove-Item -Recurse -Force "SolutionPackage" }
+
+          # Create solution folder structure
+          New-Item -ItemType Directory -Path "SolutionPackage" -Force
+          Set-Location "SolutionPackage"
+
+          # Initialize solution
+          pac solution init --publisher-name MyPublisher --publisher-prefix mp
+
+          # Add reference to PCF project
           pac solution add-reference --path ../
 
-      - name: Build Solution
-        run: |
-          cd Solution
+          # Restore and build
+          nuget restore
           msbuild /t:build /restore /p:Configuration=Release
 
-      - name: List Files
+          # Show what was created
+          Write-Host "=== Contents of bin/Release ==="
+          Get-ChildItem -Path "bin/Release" -Recurse | ForEach-Object { Write-Host $_.FullName }
+
+      - name: Extract and Repackage Solution
+        shell: pwsh
         run: |
-          echo "=== Solution bin folder ==="
-          Get-ChildItem -Path Solution/bin -Recurse
-          echo "=== Check for zip ==="
-          Get-ChildItem -Path Solution/bin/Release -Filter *.zip -Recurse
+          $zipFile = Get-ChildItem -Path "SolutionPackage/bin/Release" -Filter "*.zip" | Select-Object -First 1
+          if ($zipFile) {
+            Write-Host "Found zip: $($zipFile.FullName)"
+
+            # Extract
+            Expand-Archive -Path $zipFile.FullName -DestinationPath "SolutionExtracted" -Force
+
+            Write-Host "=== Extracted contents ==="
+            Get-ChildItem -Path "SolutionExtracted" -Recurse | ForEach-Object { Write-Host $_.FullName }
+          } else {
+            Write-Host "No zip file found!"
+          }
 
       - name: Upload Solution Artifact
         uses: actions/upload-artifact@v4
         with:
           name: PowerApps-Solution
-          path: Solution/bin/Release/*.zip
+          path: SolutionPackage/bin/Release/*.zip
           if-no-files-found: warn
