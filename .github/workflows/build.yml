@@ -34,8 +34,9 @@ jobs:
       - name: Create Solution Structure
         shell: pwsh
         run: |
-          # Create solution folder structure manually
+          # Create solution folder structure (PAC CLI expects Other/ folder)
           New-Item -ItemType Directory -Path "solution/Controls/cra0a_Company.Demo.BotIframe" -Force
+          New-Item -ItemType Directory -Path "solution/Other" -Force
 
           # Copy PCF output files
           Copy-Item "out/controls/*" -Destination "solution/Controls/cra0a_Company.Demo.BotIframe/" -Recurse -Force
@@ -51,7 +52,7 @@ jobs:
           </Types>
           '@ | Out-File -LiteralPath "solution/[Content_Types].xml" -Encoding utf8
 
-          # Create solution.xml
+          # Create Solution.xml in Other folder
           @'
           <?xml version="1.0" encoding="utf-8"?>
           <ImportExportXml version="9.1.0.643" SolutionPackageVersion="9.1" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -112,9 +113,9 @@ jobs:
               <MissingDependencies />
             </SolutionManifest>
           </ImportExportXml>
-          '@ | Out-File -FilePath "solution/solution.xml" -Encoding utf8
+          '@ | Out-File -FilePath "solution/Other/Solution.xml" -Encoding utf8
 
-          # Create customizations.xml
+          # Create Customizations.xml in Other folder
           @'
           <?xml version="1.0" encoding="utf-8"?>
           <ImportExportXml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -129,7 +130,7 @@ jobs:
             <optionsets />
             <CustomControls>
               <CustomControl Name="cra0a_Company.Demo.BotIframe" IntroducedVersion="1.0.0">
-                <FileName>Controls/cra0a_Company.Demo.BotIframe/ControlManifest.xml</FileName>
+                <FileName>/Controls/cra0a_Company.Demo.BotIframe/ControlManifest.xml</FileName>
               </CustomControl>
             </CustomControls>
             <SolutionPluginAssemblies />
@@ -138,7 +139,7 @@ jobs:
               <Language>1033</Language>
             </Languages>
           </ImportExportXml>
-          '@ | Out-File -FilePath "solution/customizations.xml" -Encoding utf8
+          '@ | Out-File -FilePath "solution/Other/Customizations.xml" -Encoding utf8
 
           Write-Host "=== Solution structure ==="
           Get-ChildItem -Path "solution" -Recurse | ForEach-Object { Write-Host $_.FullName }
