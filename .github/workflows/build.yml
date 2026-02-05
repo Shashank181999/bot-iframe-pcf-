@@ -42,8 +42,8 @@ jobs:
           Write-Host "=== PCF build output ==="
           Get-ChildItem -Path "out/controls" -Recurse | ForEach-Object { Write-Host $_.FullName }
 
-          # Copy PCF output files (contents of the built control folder)
-          Copy-Item "out/controls/Company.Demo.BotIframe/*" -Destination "packfolder/Controls/cra0a_Company.Demo.BotIframe/" -Recurse -Force
+          # Copy PCF output files (directly from out/controls/)
+          Copy-Item "out/controls/*" -Destination "packfolder/Controls/cra0a_Company.Demo.BotIframe/" -Recurse -Force
 
           # Create [Content_Types].xml
           @'
