@@ -31,8 +31,10 @@ jobs:
 
       - name: Create Solution
         run: |
-          pac solution init --publisher-name Publisher --publisher-prefix pub --outputDirectory Solution
-          pac solution add-reference --path ./ --solutionPath Solution
+          mkdir Solution
+          cd Solution
+          pac solution init --publisher-name Publisher --publisher-prefix pub
+          pac solution add-reference --path ../
 
       - name: Build Solution
         run: msbuild Solution/Solution.cdsproj /t:build /restore /p:Configuration=Release
